@@ -87,11 +87,12 @@ class Paint(object):
         ps = self.c.postscript(colormode='gray')
         img = Image.open(io.BytesIO(ps.encode('utf-8')))
         gray = img.convert('L')
-        bw = gray.point(lambda x: 1 if x < 128 else 0)
-        bw.save(filename)
-        array = np.array(bw.resize((28, 28))).reshape(self.shape)
-        # array = array.astype("float32")
-        # array /= 255
+        bw = gray.point(lambda x: 255 if x < 128 else 0)
+        # bw.save(filename)
+        array = np.array(bw.resize((28, 28)))
+        Image.fromarray(array).save(filename)
+        array = array.reshape(self.shape).astype("float32")
+        array /= 255
         ans = self.model.predict(array)[0]
         print(np.around(ans, decimals=1))
         self.stringvar.set(np.argmax(ans))
