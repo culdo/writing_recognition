@@ -17,12 +17,12 @@ class Paint(object):
 
     def __init__(self):
         self.model = mlp
-        print("使用單層神經網路")
+        print("Using MLP")
         self.shape = (1, 784)
         self.root = Tk()
-        self.root.title("手寫GUI：->單層網路")
+        self.root.title("Handwriting GUI：->MLP")
 
-        self.NN_button = Button(self.root, text='換捲積', command=self.choose_NN, font=("Courier", scale))
+        self.NN_button = Button(self.root, text='use CNN', command=self.choose_NN, font=("Courier", scale))
         self.NN_button.grid(row=0, column=0)
 
         # self.eraser_button = Button(self.root, text='預測', command=self.use_predictor, font=("Courier", scale))
@@ -31,7 +31,7 @@ class Paint(object):
         self.stringvar = StringVar()
         self.label = Label(self.root, textvariable=self.stringvar, font=("Courier", 20))
         self.label.grid(row=0, column=1)
-        self.stringvar.set("預測戳滾輪、筆粗細->")
+        self.stringvar.set("predict using middle button > scrolling change size")
 
         self.choose_size_button = Scale(self.root, from_=30, to=150, orient=HORIZONTAL, font=("Courier", scale), length=150, width=20)
         self.choose_size_button.grid(row=0, column=2)
@@ -68,18 +68,18 @@ class Paint(object):
 
     def choose_NN(self):
         if self.shape == (1, 784):
-            print("使用捲積神經網路")
+            print("Using CNN")
             self.model = cnn
             self.shape = (1, 28, 28, 1)
-            self.NN_button.config(text="換單層")
-            self.root.title("手寫GUI：->捲積網路")
+            self.NN_button.config(text="use MLP")
+            self.root.title("Handwriting GUI：->CNN")
             self.use_predictor()
         else:
-            print("使用單層神經網路")
+            print("Using MLP")
             self.model = mlp
             self.shape = (1, 784)
-            self.NN_button.config(text="換捲積")
-            self.root.title("手寫GUI：->單層網路")
+            self.NN_button.config(text="use CNN")
+            self.root.title("Handwriting GUI：->MLP")
             self.use_predictor()
 
     def use_predictor(self):
@@ -115,7 +115,7 @@ class Paint(object):
     def right_click(self, event):
         self.c.delete("all")
         self.label.config(font=("Courier", 30))
-        self.stringvar.set("我是答案")
+        self.stringvar.set("Ans")
 
     def left_click(self, event):
         self.use_predictor()
