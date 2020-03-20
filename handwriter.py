@@ -9,6 +9,7 @@ from solve_captchas_with_model import solve_handwriting
 
 scale = 12
 
+
 class Paint(object):
 
     width = 750

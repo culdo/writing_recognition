@@ -2,27 +2,55 @@ import io
 from tkinter import *
 
 import numpy as np
+import tensorflow as tf
 from PIL import Image, ImageDraw
+from keras.backend.tensorflow_backend import set_session
 from keras.models import load_model
 
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
+set_session(sess)
+
 scale = 12
-cnn = load_model("cnn_model.h5")
-mlp = load_model("mlp_model.h5")
+cnn = load_model("models/cnn_model.h5")
+mlp = load_model("models/mlp_model.h5")
+
+l8n = {"MLP": "全連接", "CNN": "捲積"}
+config = {"use_what":
+              {"zh": "使用%s神經網路",
+               "en": "Using %s"},
+          "title":
+              {"zh": "手寫GUI：->%s網路",
+               "en": "Handwriting GUI：->%s"},
+          "switch":
+              {"zh": "換%s",
+               "en": "use %s"},
+          "stringvar":
+              {"zh": "預測戳滾輪、筆粗細->",
+               "en": "predict using middle button > scrolling change size"},
+          "Answer":
+              {"zh": "我是答案",
+               "en": "Ans"},
+          "shape":
+              {"MLP": (1, 784),
+               "CNN": (1, 28, 28, 1)},
+          "model":
+              {"MLP": mlp,
+               "CNN": cnn}
+          }
 
 
 class Paint(object):
+    def __init__(self, lang="zh", width=600, height=600):
+        self.lang = lang
+        self.width = width
+        self.height = height
 
-    width = 600
-    height = 600
-
-    def __init__(self):
-        self.model = mlp
-        print("使用單層神經網路")
-        self.shape = (1, 784)
         self.root = Tk()
-        self.root.title("手寫GUI：->單層網路")
+        self.NN_button = Button(self.root, command=self.choose_NN, font=("Courier", scale))
+        self._apply_nn("MLP")
 
-        self.NN_button = Button(self.root, text='換捲積', command=self.choose_NN, font=("Courier", scale))
         self.NN_button.grid(row=0, column=0)
 
         # self.eraser_button = Button(self.root, text='預測', command=self.use_predictor, font=("Courier", scale))
@@ -31,9 +59,10 @@ class Paint(object):
         self.stringvar = StringVar()
         self.label = Label(self.root, textvariable=self.stringvar, font=("Courier", 20))
         self.label.grid(row=0, column=1)
-        self.stringvar.set("預測戳滾輪、筆粗細->")
+        self.stringvar.set(config["stringvar"][self.lang])
 
-        self.choose_size_button = Scale(self.root, from_=30, to=150, orient=HORIZONTAL, font=("Courier", scale), length=150, width=20)
+        self.choose_size_button = Scale(self.root, from_=30, to=150, orient=HORIZONTAL, font=("Courier", scale),
+                                        length=150, width=20)
         self.choose_size_button.grid(row=0, column=2)
 
         self.c = Canvas(self.root, bg='white', width=self.width, height=self.height)
@@ -66,20 +95,24 @@ class Paint(object):
             self.choose_size_button.set(count + 1)
 
     def choose_NN(self):
-        if self.shape == (1, 784):
-            print("使用捲積神經網路")
-            self.model = cnn
-            self.shape = (1, 28, 28, 1)
-            self.NN_button.config(text="換單層")
-            self.root.title("手寫GUI：->捲積網路")
-            self.use_predictor()
+        if self.model == mlp:
+            self._apply_nn("CNN")
         else:
-            print("使用單層神經網路")
-            self.model = mlp
-            self.shape = (1, 784)
-            self.NN_button.config(text="換捲積")
-            self.root.title("手寫GUI：->單層網路")
-            self.use_predictor()
+            self._apply_nn("MLP")
+
+        self.use_predictor()
+
+    def _apply_nn(self, mode):
+        if mode == "CNN":
+            switch_to = "MLP"
+        else:
+            switch_to = "CNN"
+
+        print(config["use_what"][self.lang] % l8n[mode])
+        self.model = config["model"][mode]
+        self.shape = config["shape"][mode]
+        self.NN_button.config(text=config["switch"][self.lang] % l8n[switch_to])
+        self.root.title(config["title"][self.lang] % l8n[mode])
 
     def use_predictor(self):
         filename = "my_drawing.jpg"
@@ -87,12 +120,11 @@ class Paint(object):
         ps = self.c.postscript(colormode='gray')
         img = Image.open(io.BytesIO(ps.encode('utf-8')))
         gray = img.convert('L')
-        bw = gray.point(lambda x: 255 if x < 128 else 0)
-        # bw.save(filename)
-        array = np.array(bw.resize((28, 28)))
-        Image.fromarray(array).save(filename)
-        array = array.reshape(self.shape).astype("float32")
-        array /= 255
+        bw = gray.point(lambda x: 1 if x < 128 else 0)
+        bw.save(filename)
+        array = np.array(bw.resize((28, 28))).reshape(self.shape)
+        # array = array.astype("float32")
+        # array /= 255
         ans = self.model.predict(array)[0]
         print(np.around(ans, decimals=1))
         self.stringvar.set(np.argmax(ans))
@@ -103,8 +135,8 @@ class Paint(object):
         if self.old_x and self.old_y:
             new = event.x, event.y
             self.item = self.c.create_line(self.old_x, self.old_y, *new,
-                               width=self.line_width, fill=paint_color,
-                               capstyle=ROUND, smooth=TRUE, splinesteps=36)
+                                           width=self.line_width, fill=paint_color,
+                                           capstyle=ROUND, smooth=TRUE, splinesteps=36)
         self.old_x = event.x
         self.old_y = event.y
 
@@ -118,6 +150,7 @@ class Paint(object):
 
     def left_click(self, event):
         self.use_predictor()
+
 
 if __name__ == '__main__':
     Paint()
