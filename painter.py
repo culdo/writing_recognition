@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import io
 from tkinter import *
 
@@ -13,10 +14,9 @@ sess = tf.Session(config=config)
 set_session(sess)
 
 scale = 12
+l8n = {"MLP": "全連接", "CNN": "捲積"}
 cnn = load_model("models/cnn_model.h5")
 mlp = load_model("models/mlp_model.h5")
-
-l8n = {"MLP": "全連接", "CNN": "捲積"}
 config = {"use_what":
               {"zh": "使用%s神經網路",
                "en": "Using %s"},
@@ -39,6 +39,10 @@ config = {"use_what":
               {"MLP": mlp,
                "CNN": cnn}
           }
+# Initialize model
+_ = cnn.predict(np.zeros(config["shape"]["CNN"]))[0]
+_ = mlp.predict(np.zeros(config["shape"]["MLP"]))[0]
+
 
 
 class Paint(object):
@@ -80,10 +84,10 @@ class Paint(object):
         self.choose_size_button.set(90)
         self.line_width = self.choose_size_button.get()
 
-        self.c.bind('<B1-Motion>', self.paint)
+        self.c.bind('<B1-Motion>', self._paint)
         self.c.bind('<ButtonRelease-1>', self.reset)
-        self.c.bind("<Button-3>", self.right_click)
-        self.c.bind("<Button-2>", self.left_click)
+        self.c.bind("<Button-3>", self._right_click)
+        self.c.bind("<Button-2>", self._left_click)
         self.c.bind("<Button-4>", self._on_mousewheel)
         self.c.bind("<Button-5>", self._on_mousewheel)
 
@@ -100,7 +104,7 @@ class Paint(object):
         else:
             self._apply_nn("MLP")
 
-        self.use_predictor()
+        self._use_predictor()
 
     def _apply_nn(self, mode):
         if mode == "CNN":
@@ -114,7 +118,7 @@ class Paint(object):
         self.NN_button.config(text=config["switch"][self.lang] % l8n[switch_to])
         self.root.title(config["title"][self.lang] % l8n[mode])
 
-    def use_predictor(self):
+    def _use_predictor(self):
         filename = "my_drawing.jpg"
         # self.image1.save(filename)
         ps = self.c.postscript(colormode='gray')
@@ -129,7 +133,7 @@ class Paint(object):
         print(np.around(ans, decimals=1))
         self.stringvar.set(np.argmax(ans))
 
-    def paint(self, event):
+    def _paint(self, event):
         self.line_width = self.choose_size_button.get()
         paint_color = 'black'
         if self.old_x and self.old_y:
@@ -143,13 +147,13 @@ class Paint(object):
     def reset(self, event):
         self.old_x, self.old_y = None, None
 
-    def right_click(self, event):
+    def _right_click(self, event):
         self.c.delete("all")
         self.label.config(font=("Courier", 30))
         self.stringvar.set("我是答案")
 
-    def left_click(self, event):
-        self.use_predictor()
+    def _left_click(self, event):
+        self._use_predictor()
 
 
 if __name__ == '__main__':
