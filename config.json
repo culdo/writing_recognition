@@ -1,0 +1,42 @@
+{
+  "l8n": {
+    "MLP": "全連接",
+    "CNN": "捲積"
+  },
+  "use_what": {
+    "zh": "使用%s神經網路",
+    "en": "Using %s"
+  },
+  "title": {
+    "zh": "手寫GUI：->%s網路",
+    "en": "Handwriting GUI：->%s"
+  },
+  "switch": {
+    "zh": "換%s",
+    "en": "use %s"
+  },
+  "stringvar": {
+    "zh": "預測戳滾輪、筆粗細->",
+    "en": "predict using middle button > scrolling change size"
+  },
+  "Answer": {
+    "zh": "我是答案",
+    "en": "Ans"
+  },
+  "shape": {
+    "MLP": [
+      1,
+      784
+    ],
+    "CNN": [
+      1,
+      28,
+      28,
+      1
+    ]
+  },
+  "model": {
+    "MLP": "models/mlp_model.h5",
+    "CNN": "models/cnn_model.h5"
+  }
+}

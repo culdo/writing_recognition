@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import io
+import json
 from tkinter import *
 
 import numpy as np
@@ -14,35 +15,13 @@ sess = tf.Session(config=config)
 set_session(sess)
 
 scale = 12
-l8n = {"MLP": "全連接", "CNN": "捲積"}
-cnn = load_model("models/cnn_model.h5")
-mlp = load_model("models/mlp_model.h5")
-config = {"use_what":
-              {"zh": "使用%s神經網路",
-               "en": "Using %s"},
-          "title":
-              {"zh": "手寫GUI：->%s網路",
-               "en": "Handwriting GUI：->%s"},
-          "switch":
-              {"zh": "換%s",
-               "en": "use %s"},
-          "stringvar":
-              {"zh": "預測戳滾輪、筆粗細->",
-               "en": "predict using middle button > scrolling change size"},
-          "Answer":
-              {"zh": "我是答案",
-               "en": "Ans"},
-          "shape":
-              {"MLP": (1, 784),
-               "CNN": (1, 28, 28, 1)},
-          "model":
-              {"MLP": mlp,
-               "CNN": cnn}
-          }
+with open("config.json") as f:
+    config = json.load(f)
+config["model"]["CNN"] = load_model(config["model"]["CNN"])
+config["model"]["MLP"] = load_model(config["model"]["MLP"])
 # Initialize model
-_ = cnn.predict(np.zeros(config["shape"]["CNN"]))[0]
-_ = mlp.predict(np.zeros(config["shape"]["MLP"]))[0]
-
+_ = config["model"]["CNN"].predict(np.zeros(config["shape"]["CNN"]))[0]
+_ = config["model"]["MLP"].predict(np.zeros(config["shape"]["MLP"]))[0]
 
 
 class Paint(object):
@@ -99,7 +78,7 @@ class Paint(object):
             self.choose_size_button.set(count + 1)
 
     def choose_NN(self):
-        if self.model == mlp:
+        if self.mode == "MLP":
             self._apply_nn("CNN")
         else:
             self._apply_nn("MLP")
@@ -108,15 +87,16 @@ class Paint(object):
 
     def _apply_nn(self, mode):
         if mode == "CNN":
-            switch_to = "MLP"
+            option_to = "MLP"
         else:
-            switch_to = "CNN"
+            option_to = "CNN"
+        self.mode = mode
 
-        print(config["use_what"][self.lang] % l8n[mode])
+        print(config["use_what"][self.lang] % config["l8n"][mode])
         self.model = config["model"][mode]
         self.shape = config["shape"][mode]
-        self.NN_button.config(text=config["switch"][self.lang] % l8n[switch_to])
-        self.root.title(config["title"][self.lang] % l8n[mode])
+        self.NN_button.config(text=config["switch"][self.lang] % config["l8n"][option_to])
+        self.root.title(config["title"][self.lang] % config["l8n"][mode])
 
     def _use_predictor(self):
         filename = "my_drawing.jpg"
