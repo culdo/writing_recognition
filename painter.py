@@ -6,13 +6,10 @@ from tkinter import *
 import numpy as np
 import tensorflow as tf
 from PIL import Image, ImageDraw
-from keras.backend.tensorflow_backend import set_session
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-sess = tf.Session(config=config)
-set_session(sess)
+gpus = tf.config.experimental.list_physical_devices('GPU')
+[tf.config.experimental.set_memory_growth(gpu, True) for gpu in gpus if gpus]
 
 scale = 12
 with open("config.json") as f:

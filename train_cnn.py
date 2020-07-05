@@ -7,13 +7,18 @@ Gets to 99.25% test accuracy after 12 epochs
 
 from __future__ import print_function
 
-import keras
-from keras import backend as K
-from keras.datasets import mnist
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Dense, Dropout, Flatten
-from keras.models import Sequential
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import backend as K
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.models import Sequential
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    [tf.config.experimental.set_memory_growth(gpu, True) for gpu in gpus]
+# tf.config.set_visible_devices([], 'GPU')
 batch_size = 128
 num_classes = 10
 epochs = 12
@@ -58,7 +63,7 @@ model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.Adadelta(),
+              optimizer=keras.optimizers.Adam(),
               metrics=['accuracy'])
 
 model.fit(x_train, y_train,
@@ -67,6 +72,6 @@ model.fit(x_train, y_train,
           verbose=1,
           validation_data=(x_test, y_test))
 score = model.evaluate(x_test, y_test, verbose=0)
-model.save('cnn_model.h5')
+model.save('models/cnn_model.h5')
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])

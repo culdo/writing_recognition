@@ -7,11 +7,11 @@ Gets to 98.40% test accuracy after 20 epochs
 
 from __future__ import print_function
 
-import keras
-from keras.datasets import mnist
-from keras.layers import Dense, Dropout
-from keras.models import Sequential
-from keras.optimizers import RMSprop
+from tensorflow import keras
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import RMSprop
 
 batch_size = 128
 num_classes = 10
