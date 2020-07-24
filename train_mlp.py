@@ -7,11 +7,16 @@ Gets to 98.40% test accuracy after 20 epochs
 
 from __future__ import print_function
 
+import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import RMSprop
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    [tf.config.experimental.set_memory_growth(gpu, True) for gpu in gpus]
 
 batch_size = 128
 num_classes = 10
@@ -53,6 +58,6 @@ history = model.fit(x_train, y_train,
                     validation_data=(x_test, y_test))
 
 score = model.evaluate(x_test, y_test, verbose=0)
-model.save('my_model.h5')
+model.save('models/mlp_model.h5')
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])

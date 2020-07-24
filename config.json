@@ -1,7 +1,13 @@
 {
   "l8n": {
-    "MLP": "全連接",
-    "CNN": "捲積"
+    "MLP": {
+      "en": "MLP",
+      "zh": "全連接"
+    },
+    "CNN": {
+      "en": "CNN",
+      "zh": "捲積"
+    }
   },
   "use_what": {
     "zh": "使用%s神經網路",
@@ -17,7 +23,7 @@
   },
   "stringvar": {
     "zh": "預測戳滾輪、筆粗細->",
-    "en": "predict using middle button > scrolling change size"
+    "en": "clicking middle button to predict,\nscrolling to change font size->"
   },
   "Answer": {
     "zh": "我是答案",

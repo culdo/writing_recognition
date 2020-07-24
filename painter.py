@@ -22,7 +22,7 @@ _ = config["model"]["MLP"].predict(np.zeros(config["shape"]["MLP"]))[0]
 
 
 class Paint(object):
-    def __init__(self, lang="zh", width=600, height=600):
+    def __init__(self, lang="en", width=600, height=600):
         self.lang = lang
         self.width = width
         self.height = height
@@ -37,7 +37,10 @@ class Paint(object):
         # self.eraser_button.grid(row=0, column=1)
 
         self.stringvar = StringVar()
-        self.label = Label(self.root, textvariable=self.stringvar, font=("Courier", 20))
+        if lang == "zh":
+            self.label = Label(self.root, textvariable=self.stringvar, font=("Courier", 20))
+        elif lang == "en":
+            self.label = Label(self.root, textvariable=self.stringvar, font=("Courier", 12))
         self.label.grid(row=0, column=1)
         self.stringvar.set(config["stringvar"][self.lang])
 
@@ -57,7 +60,7 @@ class Paint(object):
     def setup(self):
         self.old_x = None
         self.old_y = None
-        self.choose_size_button.set(90)
+        self.choose_size_button.set(60)
         self.line_width = self.choose_size_button.get()
 
         self.c.bind('<B1-Motion>', self._paint)
@@ -92,8 +95,8 @@ class Paint(object):
         print(config["use_what"][self.lang] % config["l8n"][mode])
         self.model = config["model"][mode]
         self.shape = config["shape"][mode]
-        self.NN_button.config(text=config["switch"][self.lang] % config["l8n"][option_to])
-        self.root.title(config["title"][self.lang] % config["l8n"][mode])
+        self.NN_button.config(text=config["switch"][self.lang] % config["l8n"][option_to][self.lang])
+        self.root.title(config["title"][self.lang] % config["l8n"][mode][self.lang])
 
     def _use_predictor(self):
         filename = "my_drawing.jpg"
@@ -127,7 +130,7 @@ class Paint(object):
     def _right_click(self, event):
         self.c.delete("all")
         self.label.config(font=("Courier", 30))
-        self.stringvar.set("我是答案")
+        self.stringvar.set(config["Answer"][self.lang])
 
     def _left_click(self, event):
         self._use_predictor()
