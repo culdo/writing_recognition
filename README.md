@@ -1,7 +1,7 @@
 # mnist_vis
 ![alt text](docs/en_demo.gif "Mnist Demo en")
 
-![alt text](docs/zh_demo.gif "Mnist Demo zh")\
+![alt text](docs/zh_demo.gif "Mnist Demo zh")
 
 當你train好Keras mnist，想寫個數字讓他predict看看\
 When you train mnist finished, then want to write a number to see it can be used or not.
