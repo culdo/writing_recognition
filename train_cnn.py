@@ -13,6 +13,7 @@ from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.models import Sequential
+from tensorflow.python.keras import Input
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -45,18 +46,18 @@ print(x_test.shape[0], 'test samples')
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-model = Sequential()
-model.add(Conv2D(32, kernel_size=(3, 3),
-                 activation='relu',
-                 input_shape=input_shape))
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(num_classes, activation='softmax'))
+inputs = Input(shape=input_shape)
+x = Conv2D(32, kernel_size=(3, 3),
+                 activation='relu')(inputs)
+x = Conv2D(64, (3, 3), activation='relu')(x)
+x = MaxPooling2D(pool_size=(2, 2))(x)
+x = Dropout(0.25)(x)
+x = Flatten()(x)
+x = Dense(128, activation='relu')(x)
+x = Dropout(0.5)(x)
+outputs = Dense(num_classes, activation='softmax')(x)
 
+model = keras.Model(inputs=inputs, outputs=outputs, name="mnist_model")
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
               metrics=['accuracy'])

@@ -12,7 +12,7 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 [tf.config.experimental.set_memory_growth(gpu, True) for gpu in gpus if gpus]
 
 scale = 12
-with open("config.json") as f:
+with open("config.json", encoding="utf-8") as f:
     config = json.load(f)
 config["model"]["CNN"] = load_model(config["model"]["CNN"])
 config["model"]["MLP"] = load_model(config["model"]["MLP"])
